@@ -277,10 +277,11 @@ function rItem(){
   else if(x&&mode==='out'&&q>0&&q/x.un>x.s+0.0005)w=`No alcanza: hay ${fmt(x.s*x.un,1)} ${x.us} en sistema. Se puede guardar igual.`;
   msg('sMsg','warn',w);
 }
-function lotProducts(){const pf=S.items.filter(x=>x.b==='Producto Final'&&!/^disponible$/i.test(x.n.trim()));return pf.sort((a,b)=>a.n.localeCompare(b.n))}
+function lotProducts(){const pf=S.items.filter(x=>x.b==='Producto Final'&&x.n.trim()&&!/^disponible$/i.test(x.n.trim()));return pf.sort((a,b)=>a.n.localeCompare(b.n))}
 function rLote(){
   const sel=$('lP');
-  if(!sel.options.length){sel.innerHTML=lotProducts().map(x=>`<option value="${esc(x.c)}">${esc(x.n)}${S.recetas[x.c]?'':' (sin receta)'}</option>`).join('');const f=Object.keys(S.recetas)[0];if(f)sel.value=f}
+  if(!sel.options.length){const P=lotProducts(),dup=n=>P.filter(y=>y.n.trim().toLowerCase()===n.trim().toLowerCase()).length>1;
+    sel.innerHTML=P.map(x=>`<option value="${esc(x.c)}">${esc(x.n)}${dup(x.n)?' · '+esc(x.c):''}${S.recetas[x.c]?'':' (sin receta)'}</option>`).join('');const f=Object.keys(S.recetas)[0];if(f)sel.value=f}
   const p=sel.value,r=S.recetas[p];
   const fixed=r&&r.litros>0;
   $('lLl').textContent=fixed?'Litros a elaborar':'Número de tandas';
