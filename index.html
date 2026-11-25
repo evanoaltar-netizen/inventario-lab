@@ -1,0 +1,419 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1d6b3c">
+<title>Inventario Laboratorio</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#0c1710);--ink:light-dark(#0f1f15,#e7f0e9);--mute:light-dark(#5a6b60,#9fb3a6);--leaf:light-dark(#1d6b3c,#5cc285);--leafbg:light-dark(#e5f2e9,#13301f);--line:light-dark(#d9e3dc,#25382c);--card:light-dark(#ffffff,#122119);--paper:light-dark(#fbfaf5,#18261d);--alert:light-dark(#c8432a,#ff7a5c);--alertbg:light-dark(#fdebe6,#3a1a12);--onleaf:light-dark(#ffffff,#06140b)}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Figtree,system-ui,sans-serif;overflow-x:clip}
+.app{max-width:480px;margin:0 auto;padding:0 16px 120px}
+header{padding:14px 0;border-bottom:1px solid var(--line)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.top b{font-weight:800;font-size:18px;color:var(--leaf)}
+select,input{font:16px Figtree,sans-serif;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;min-height:46px;padding:8px 12px;width:100%}
+.who{width:auto;border-radius:999px;min-height:36px;padding:4px 12px;font-size:14px}
+h1{font-size:30px;line-height:1.05;letter-spacing:-.02em;margin:14px 0 4px;font-weight:800}
+.sub{color:var(--mute);font-size:15px}
+.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:14px}
+.tab,.btn{min-height:44px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 14px Figtree,sans-serif;cursor:pointer;padding:0 10px}
+.tab[aria-pressed=true]{background:var(--leaf);border-color:var(--leaf);color:var(--onleaf)}
+.btn.main{background:var(--leaf);border-color:var(--leaf);color:var(--onleaf);font-size:16px;width:100%;min-height:52px;margin-top:12px}
+.btn.line{color:var(--leaf);border-color:var(--leaf);width:100%;margin-top:10px}
+.btn.bad{background:var(--alert);border-color:var(--alert);color:#fff}
+.link{background:none;border:0;color:var(--leaf);font:600 15px Figtree,sans-serif;min-height:44px;padding:0;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid color-mix(in srgb,var(--leaf) 55%,transparent);outline-offset:2px}
+.seg{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;min-height:40px;padding:6px 14px;font:500 14px Figtree,sans-serif;cursor:pointer}
+.chip[aria-pressed=true]{border-color:var(--leaf);color:var(--leaf);background:var(--leafbg);font-weight:600}
+.chip.bad[aria-pressed=true]{border-color:var(--alert);color:var(--alert);background:var(--alertbg)}
+ul{list-style:none;margin:0;padding:0}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.row .d{font-weight:600;line-height:1.3}.row .m{font-size:13px;color:var(--mute)}
+.q{font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums;text-align:right;font-size:18px}
+.q small{display:block;font-weight:500;font-size:13px;color:var(--mute)}
+.neg .q{color:var(--alert)}
+.flag{display:inline-block;font-size:12px;font-weight:600;color:var(--alert);background:var(--alertbg);border-radius:6px;padding:1px 6px;margin-left:4px}
+.tag{display:inline-block;font-size:12px;font-weight:600;color:var(--leaf);background:var(--leafbg);border-radius:6px;padding:1px 6px;margin-left:4px}
+.day{font-size:14px;font-weight:600;color:var(--mute);padding:16px 0 0}
+.in{color:var(--leaf)}
+.acts{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}
+.fab{position:fixed;left:50%;transform:translateX(-50%);bottom:max(16px,env(safe-area-inset-bottom,0px));width:min(448px,calc(100% - 32px));min-height:60px;border:0;border-radius:18px;background:var(--leaf);color:var(--onleaf);font:800 18px Figtree,sans-serif;cursor:pointer;box-shadow:0 8px 20px -10px color-mix(in srgb,var(--leaf) 70%,transparent)}
+.fab:disabled{opacity:.6}
+.hidden{display:none!important}
+.f{display:grid;gap:4px;margin-top:12px}
+.f label,.lab{font-size:14px;font-weight:600;color:var(--mute)}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.hint{font-size:13px;color:var(--mute)}
+.big{font-size:22px;font-weight:800;text-align:right;font-variant-numeric:tabular-nums}
+.card{margin-top:14px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.rec{display:grid;grid-template-columns:minmax(0,1fr) 96px;gap:2px 10px;align-items:center;padding:9px 0;border-bottom:1px dashed var(--line)}
+.rec:last-child{border-bottom:0}
+.rec .n{font-weight:600;line-height:1.25}.rec input{min-height:40px;text-align:right;padding:6px 8px}
+.rec .s{font-size:13px;color:var(--mute);grid-column:1/-1}
+.rec.short .s{color:var(--alert);font-weight:600}
+.rec3{grid-template-columns:minmax(0,1fr) 84px 40px}
+.x{min-height:40px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--alert);font-size:18px;cursor:pointer}
+.good,.warn{margin-top:14px;border-radius:12px;padding:12px 14px;font-weight:600;font-size:15px}
+.good{background:var(--leafbg);color:var(--leaf)}.warn{background:var(--alertbg);color:var(--alert)}
+.cnt{display:grid;grid-template-columns:minmax(0,1fr) 92px 72px;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.cnt input{min-height:42px;text-align:right;padding:6px 8px}
+.cnt .df{text-align:right;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.cnt .df.x2{color:var(--alert)}
+.sum{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:15px;margin-top:8px}
+.sum span{color:var(--mute)}.sum b{text-align:right;font-variant-numeric:tabular-nums}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:92px;background:var(--ink);color:var(--bg);border-radius:12px;padding:10px 16px;font-weight:600;font-size:15px;transition:opacity .3s;max-width:calc(100% - 32px);opacity:0;pointer-events:none;z-index:5}
+.toast.on{opacity:1}
+@media(prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <section id="v-pin" class="hidden">
+    <h1 style="margin-top:40px">Inventario Laboratorio</h1>
+    <div class="sub">Agro Organic · Bodega del laboratorio</div>
+    <div class="f"><label for="pin">PIN</label><input id="pin" inputmode="numeric" autocomplete="off"></div>
+    <button class="btn main" id="bPin">Entrar</button>
+    <div id="pinErr"></div>
+  </section>
+
+  <div id="main" class="hidden">
+  <header>
+    <div class="top"><b>Agro Organic · Bodega Lab</b><select class="who" id="who" aria-label="Quién registra"></select></div>
+    <h1 id="title">Saldos</h1>
+    <div class="sub" id="subt"></div>
+    <div class="tabs" id="tabs">
+      <button class="tab" data-v="saldos">Saldos</button><button class="tab" data-v="movs">Movim.</button>
+      <button class="tab" data-v="conteo">Conteo</button><button class="tab" data-v="excel">Excel</button>
+    </div>
+  </header>
+
+  <section id="v-saldos">
+    <div class="f"><input id="q" type="search" placeholder="Buscar insumo o código" aria-label="Buscar"></div>
+    <div class="seg" id="fb">
+      <button class="chip" data-b="" aria-pressed="true">Todo</button>
+      <button class="chip" data-b="Materia Prima" aria-pressed="false">Materia prima</button>
+      <button class="chip" data-b="Producto Final" aria-pressed="false">Producto final</button>
+      <button class="chip bad" data-b="!" aria-pressed="false">Revisar</button>
+    </div>
+    <label class="hint" style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="all" style="width:auto;min-height:0"> Ver catálogo completo</label>
+    <ul id="lst"></ul>
+  </section>
+
+  <section id="v-movs" class="hidden"><ul id="mlst"></ul></section>
+
+  <section id="v-conteo" class="hidden">
+    <div class="good">Escriba lo que hay en la bodega. Se guarda solo y va a la columna "Bodega Física" del Excel.</div>
+    <div class="seg" id="cb">
+      <button class="chip" data-b="Materia Prima" aria-pressed="true">Materia prima</button>
+      <button class="chip" data-b="Producto Final" aria-pressed="false">Producto final</button>
+    </div>
+    <div class="f"><input id="cq" type="search" placeholder="Buscar" aria-label="Buscar en conteo"></div>
+    <div id="clst"></div>
+  </section>
+
+  <section id="v-excel" class="hidden">
+    <div class="card"><b>Excel base</b><div class="sum" id="xs"></div></div>
+    <button class="btn main" id="bx1">Descargar Excel (sin cerrar)</button>
+    <button class="btn line" id="bx2">Cerrar semana y descargar</button>
+    <button class="btn bad hidden" id="bx2ok" style="width:100%;margin-top:10px">Confirmar: cerrar semana</button>
+    <div class="hint" style="margin-top:10px">Al abrir en Excel, toque "Habilitar edición" si aparece. Las tablas dinámicas se actualizan solas.</div>
+    <div id="xMsg"></div>
+  </section>
+
+  <section id="v-new" class="hidden">
+    <div class="seg" id="mode">
+      <button class="chip" data-m="out">Salida</button><button class="chip" data-m="in">Entrada</button><button class="chip" data-m="lote">Elaborar lote</button>
+    </div>
+    <div id="simple">
+      <div class="f"><label for="iItem">Insumo</label><input id="iItem" list="dl" placeholder="Escriba el nombre o código" autocomplete="off"><datalist id="dl"></datalist></div>
+      <div class="hint" id="iInfo"></div>
+      <div class="two">
+        <div class="f"><label for="iQ" id="lQ">Cantidad</label><input id="iQ" class="big" inputmode="decimal"></div>
+        <div class="f"><label for="iF">Fecha</label><input id="iF" type="date"></div>
+      </div>
+      <div class="f"><span class="lab">Destino / origen</span><div class="seg" id="dest" style="margin-top:2px"></div>
+        <input id="iD" placeholder="Otro destino" style="margin-top:8px"></div>
+      <div class="f" id="fFac"><label for="iFa">No. Factura</label><input id="iFa" placeholder="Opcional"></div>
+      <div class="f"><label for="iN">Comentario</label><input id="iN" placeholder="Opcional"></div>
+      <button class="link" id="bNewItem">+ Insumo nuevo (código Agrocumbre)</button>
+      <div id="sMsg"></div>
+    </div>
+    <div id="lote" class="hidden">
+      <div class="f"><label for="lP">Producto</label><select id="lP"></select></div>
+      <div class="two">
+        <div class="f"><label for="lL" id="lLl">Litros a elaborar</label><input id="lL" class="big" inputmode="decimal"></div>
+        <div class="f"><label for="lF">Fecha</label><input id="lF" type="date"></div>
+      </div>
+      <div class="f" id="fEnt"><label for="lE">Litros que entran a bodega ahora</label><input id="lE" inputmode="decimal" placeholder="Vacío si está en fermentación"></div>
+      <div class="card"><div class="hint" id="lSrc"></div><div id="lRec"></div></div>
+      <button class="link" id="bEditRec">Editar receta</button>
+      <div id="lMsg"></div>
+    </div>
+  </section>
+
+  <section id="v-item" class="hidden">
+    <div class="f"><label for="nC">Código Agrocumbre</label><input id="nC" placeholder="INA00636" autocapitalize="characters"></div>
+    <div class="f"><label for="nN">Nombre</label><input id="nN"></div>
+    <div class="two">
+      <div class="f"><label for="nU">Unidad (envase)</label><input id="nU" placeholder="Bolsa 25 kg"></div>
+      <div class="f"><label for="nS">Unidad de salida</label><input id="nS" placeholder="kg"></div>
+    </div>
+    <div class="f"><label for="nUN">Cuánto trae un envase, en unidad de salida (UN)</label><input id="nUN" inputmode="decimal" placeholder="25"></div>
+    <div class="f"><label for="nT">Tipo</label><input id="nT" list="dlT"><datalist id="dlT"></datalist></div>
+    <div class="seg" id="nB"><button class="chip" data-b="Materia Prima" aria-pressed="true">Materia prima</button><button class="chip" data-b="Producto Final" aria-pressed="false">Producto final</button></div>
+    <div id="nMsg"></div>
+  </section>
+
+  <section id="v-rec" class="hidden">
+    <div class="hint" id="rP"></div>
+    <div class="f"><label for="rL">Litros del lote</label><input id="rL" inputmode="decimal" placeholder="Vacío si es fermentación"></div>
+    <div class="card" id="rLines"></div>
+    <button class="btn line" id="rAdd">+ Agregar insumo</button>
+    <div id="rMsg"></div>
+  </section>
+  </div>
+</div>
+<button class="fab hidden" id="fab"></button>
+<div class="toast" id="toast"></div>
+
+<script>
+{
+const API='https://script.google.com/macros/s/AKfycbzbsT1RYlLLxVGvZiJ6PW9XCS0_htNXo-tx193qzZm8gEXAfruoBCfFA3efh3s-NZWM/exec';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=(v,d=3)=>(+v||0).toLocaleString('es-GT',{maximumFractionDigits:d});
+const num=v=>{const x=parseFloat(String(v??'').replace(',','.'));return isFinite(x)?x:0};
+const ls={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const dmy=s=>String(s||'').split('-').reverse().join('/');
+let PIN=ls.get('inv_pin')||'',S=null,byC={},view='saldos',fb='',cb='Materia Prima',mode='out',dest='',busy=false,openMov=null,recLines=[],nb='Materia Prima',back='saldos';
+
+async function call(fn,...args){
+  let r;
+  try{r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({fn,args}),credentials:'omit',redirect:'follow'})}
+  catch(e){throw new Error('Sin conexión. Revise el internet e intente de nuevo.')}
+  let j;try{j=await r.json()}catch(e){throw new Error('Respuesta inválida del servidor ('+r.status+').')}
+  if(!j.ok)throw new Error(j.error||'Error');
+  return j.data;
+}
+const toast=t=>{const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>e.classList.remove('on'),2800)};
+const msg=(el,cls,t)=>{$(el).innerHTML=t?'<div class="'+cls+'">'+esc(t)+'</div>':''};
+function setState(d){S=d;byC={};S.items.forEach(x=>byC[x.c]=x)}
+const bad=x=>x.s<-0.0005;
+const W=()=>$('who').value;
+const label=x=>x.n+' · '+x.c;
+const fromLabel=v=>{const m=String(v).match(/([A-Z]{2,6}\d{3,6})\s*$/i);return m?byC[m[1].toUpperCase()]:S.items.find(x=>x.n.toLowerCase()===String(v).trim().toLowerCase())};
+const saldoTxt=x=>fmt(x.s)+' '+x.u+(x.un>1?' (= '+fmt(x.s*x.un,1)+' '+x.us+')':'');
+
+/* ---------- vistas ---------- */
+const VT={saldos:'Saldos',movs:'Movimientos',conteo:'Conteo físico',excel:'Excel',new:'Nuevo movimiento',item:'Insumo nuevo',rec:'Receta'};
+function show(v){
+  view=v;
+  for(const s of ['saldos','movs','conteo','excel','new','item','rec'])$('v-'+s).classList.toggle('hidden',s!==v);
+  document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-pressed',t.dataset.v===v));
+  $('title').textContent=VT[v];
+  const f=$('fab');f.classList.toggle('hidden',['conteo','excel'].includes(v));
+  f.textContent={saldos:'+ Registrar movimiento',movs:'+ Registrar movimiento',new:mode==='lote'?'Guardar lote':'Guardar',item:'Guardar insumo',rec:'Guardar receta'}[v]||'';
+  ({saldos:rSaldos,movs:rMovs,conteo:rConteo,excel:rExcel,new:rNew,item:()=>{},rec:rRec})[v]();
+  if(v!=='new'||!busy)window.scrollTo(0,0);
+}
+function rSaldos(){
+  const q=$('q').value.toLowerCase().trim(),all=$('all').checked;
+  const L=S.items.filter(x=>(all||x.usado||x.nuevo)&&(!fb||(fb==='!'?bad(x):x.b===fb))&&(!q||x.n.toLowerCase().includes(q)||x.c.toLowerCase().includes(q)));
+  L.sort((a,b)=>a.b.localeCompare(b.b)||a.n.localeCompare(b.n));
+  $('lst').innerHTML=L.slice(0,400).map(x=>`<li class="row ${bad(x)?'neg':''}"><div><div class="d">${esc(x.n)}${bad(x)?'<span class="flag">saldo negativo</span>':''}${x.un==null&&x.usado?'<span class="flag">sin UN</span>':''}${x.nuevo?'<span class="tag">nuevo</span>':''}</div><div class="m">${esc(x.c)} · ${esc(x.u)}${x.t?' · '+esc(x.t):''}</div></div><div class="q">${fmt(x.s)}<small>${x.un>1?esc(fmt(x.s*x.un,1)+' '+x.us):esc(x.u)}</small></div></li>`).join('')||'<li class="row"><div class="m">Sin resultados</div></li>';
+  const u=S.items.filter(x=>x.usado).length;$('subt').textContent=`${u} insumos en uso · ${S.items.filter(bad).length} para revisar`;
+}
+function rMovs(){
+  const L=S.movs.slice().sort((a,b)=>(b.f+b.id).localeCompare(a.f+a.id));let last='',h='';
+  for(const m of L){const x=byC[m.c]||{n:m.c,u:'',us:''};
+    if(m.f!==last){last=m.f;h+=`<li class="day">${esc(dmy(m.f))}</li>`}
+    const v=m.i?`<span class="in">+${fmt(m.i)}</span><small>${esc(x.u)}</small>`:`−${fmt(m.s)}<small>${esc(x.us)}</small>`;
+    h+=`<li class="row" data-id="${esc(m.id)}"><div><div class="d">${esc(x.n)}</div><div class="m">${esc(m.d||'-')}${m.o?' · '+esc(m.o):''} · ${esc(m.por)}${m.x?' · en Excel '+esc(dmy(m.x)):''}</div></div><div class="q">${v}</div>`+
+      (openMov===m.id?`<div class="acts">${m.fa?'<span class="hint">Factura '+esc(m.fa)+'</span>':''}${m.co?'<span class="hint">'+esc(m.co)+'</span>':''}${m.x?'<span class="hint">Ya está en un Excel cerrado.</span>':`<button class="btn" data-del="${esc(m.id)}">Eliminar</button>`}</div>`:'')+'</li>';}
+  $('mlst').innerHTML=h||'<li class="row"><div class="m">Todavía no hay movimientos registrados en la app.</div></li>';
+  $('subt').textContent=`${S.pendientes} pendientes de pasar al Excel`;
+}
+function rConteo(){
+  const q=$('cq').value.toLowerCase().trim();
+  const L=S.items.filter(x=>x.b===cb&&(x.usado||x.nuevo||S.conteo[x.c])&&(!q||x.n.toLowerCase().includes(q)||x.c.toLowerCase().includes(q))).sort((a,b)=>a.c.localeCompare(b.c));
+  $('clst').innerHTML=`<div class="cnt hint"><span>Insumo · sistema</span><span style="text-align:right">Físico</span><span style="text-align:right">Dif.</span></div>`+
+    L.map(x=>{const c=S.conteo[x.c],v=c?c.v:'',d=v===''?null:(+v-x.s);
+    return `<div class="cnt"><div><div style="font-weight:600;line-height:1.3">${esc(x.n)}</div><div class="hint">${fmt(x.s)} ${esc(x.u)}${c?' · contado '+esc(dmy(c.f)):''}</div></div><input data-c="${esc(x.c)}" inputmode="decimal" value="${esc(v)}" aria-label="Físico ${esc(x.n)}"><div class="df ${d!==null&&Math.abs(d)>0.0005?'x2':''}">${d===null?'—':(d>0?'+':'')+fmt(d)}</div></div>`}).join('');
+  $('subt').textContent=`${Object.keys(S.conteo).length} productos con conteo`;
+}
+function rExcel(){
+  $('xs').innerHTML=`<span>Archivo</span><b>${esc(S.base)}</b><span>Movimientos nuevos</span><b>${S.pendientes}</b><span>Insumos nuevos</span><b>${S.items.filter(x=>x.nuevo).length}</b><span>Productos contados</span><b>${Object.keys(S.conteo).length}</b>`;
+  $('subt').textContent='Mismo formato del S47, con las tablas dinámicas';
+}
+function fillDl(){$('dl').innerHTML=S.items.filter(x=>x.usado||x.nuevo||$('all').checked).map(x=>`<option value="${esc(label(x))}">`).join('')}
+function rNew(){
+  document.querySelectorAll('#mode .chip').forEach(c=>c.setAttribute('aria-pressed',c.dataset.m===mode));
+  $('simple').classList.toggle('hidden',mode==='lote');$('lote').classList.toggle('hidden',mode!=='lote');
+  $('fab').textContent=mode==='lote'?'Guardar lote':'Guardar';
+  $('subt').textContent='Registra: '+W();
+  if(!$('iF').value)$('iF').value=today();if(!$('lF').value)$('lF').value=today();
+  if(mode==='lote'){rLote();return}
+  fillDl();
+  const ds=S.destinos[mode]||[];if(!ds.includes(dest))dest=ds[0]||'';
+  $('dest').innerHTML=ds.map(d=>`<button class="chip" data-d="${esc(d)}" aria-pressed="${d===dest&&!$('iD').value}">${esc(d)}</button>`).join('');
+  $('fFac').classList.toggle('hidden',mode!=='in');
+  rItem();
+}
+function rItem(){
+  const x=fromLabel($('iItem').value);
+  $('lQ').textContent=x?'Cantidad en '+(mode==='in'?x.u:x.us):'Cantidad';
+  $('iInfo').textContent=x?`${x.c} · ${x.b} · saldo ${saldoTxt(x)}`:'Código, unidad y tipo se llenan solos.';
+  const q=num($('iQ').value);let w='';
+  if(x&&mode==='out'&&x.un==null)w='Este insumo no tiene UN en el catálogo: en el Excel la salida contará 0.';
+  else if(x&&mode==='out'&&q>0&&q/x.un>x.s+0.0005)w=`No alcanza: hay ${fmt(x.s*x.un,1)} ${x.us} en sistema. Se puede guardar igual.`;
+  msg('sMsg','warn',w);
+}
+function lotProducts(){const pf=S.items.filter(x=>x.b==='Producto Final'&&!/^disponible$/i.test(x.n.trim()));return pf.sort((a,b)=>a.n.localeCompare(b.n))}
+function rLote(){
+  const sel=$('lP');
+  if(!sel.options.length){sel.innerHTML=lotProducts().map(x=>`<option value="${esc(x.c)}">${esc(x.n)}${S.recetas[x.c]?'':' (sin receta)'}</option>`).join('');const f=Object.keys(S.recetas)[0];if(f)sel.value=f}
+  const p=sel.value,r=S.recetas[p];
+  const fixed=r&&r.litros>0;
+  $('lLl').textContent=fixed?'Litros a elaborar':'Número de tandas';
+  if(!$('lL').dataset.p||$('lL').dataset.p!==p){$('lL').value=fixed?r.litros:1;$('lL').dataset.p=p;$('lE').value='';buildLines()}
+  $('fEnt').classList.toggle('hidden',fixed);
+  $('lSrc').textContent=!r?'Este producto no tiene receta. Use "Editar receta" para crearla.':fixed?`Receta para ${fmt(r.litros)} L. Revise las cantidades antes de guardar.`:'Producto en fermentación: la receta es por tanda. Registre la entrada cuando esté listo.';
+  lineCheck();
+}
+let lineQ=[];
+function buildLines(){
+  const p=$('lP').value,r=S.recetas[p];const k=r?(r.litros>0?num($('lL').value)/r.litros:num($('lL').value)):0;
+  lineQ=r?r.i.map(([c,q])=>[c,+(q*k).toFixed(4)]):[];
+  $('lRec').innerHTML=lineQ.map(([c,q],i)=>{const x=byC[c]||{n:c,us:''};return `<div class="rec" data-i="${i}"><span class="n">${esc(x.n)}<br><span class="hint">${esc(c)} · ${esc(x.us)}</span></span><input inputmode="decimal" data-i="${i}" value="${q}" aria-label="Cantidad ${esc(x.n)}"><span class="s"></span></div>`}).join('');
+}
+function lineCheck(){
+  let short=0;
+  document.querySelectorAll('#lRec .rec').forEach(el=>{const i=+el.dataset.i,[c]=lineQ[i],x=byC[c],q=num(el.querySelector('input').value);lineQ[i][1]=q;
+    const have=x&&x.un?x.s*x.un:0,s=x&&x.un&&q>have+0.0005;if(s)short++;el.classList.toggle('short',!!s);
+    el.querySelector('.s').textContent=!x?'Código no existe':x.un==null?'Sin UN en el catálogo':`${s?'Falta · ':''}hay ${fmt(have,1)} ${x.us}`});
+  const p=$('lP').value,r=S.recetas[p],L=r&&r.litros>0?num($('lL').value):num($('lE').value);
+  const n=lineQ.filter(l=>l[1]>0).length;
+  $('lMsg').innerHTML=!r?'':(short?`<div class="warn">${short} insumo(s) sin saldo suficiente. Se puede guardar igual.</div>`:'')+`<div class="good">Se guardan ${n} salidas de materia prima${L>0?' y 1 entrada de '+esc(fmt(L))+' L de '+esc(byC[p].n):''}.</div>`;
+}
+function rRec(){
+  const p=$('lP').value,x=byC[p];$('rP').textContent=(x?x.n:p)+' · '+p;
+  $('rLines').innerHTML=recLines.map((l,i)=>`<div class="rec rec3"><input list="dlAll" data-ri="${i}" data-k="c" value="${esc(l[0]&&byC[l[0]]?label(byC[l[0]]):l[0])}" placeholder="Insumo" aria-label="Insumo"><input data-ri="${i}" data-k="q" inputmode="decimal" value="${l[1]||''}" aria-label="Cantidad"><button class="x" data-rx="${i}" aria-label="Quitar">×</button><span class="s">${l[0]&&byC[l[0]]?esc(byC[l[0]].us):''}</span></div>`).join('')+
+    `<datalist id="dlAll">${S.items.filter(x=>x.b==='Materia Prima').map(x=>`<option value="${esc(label(x))}">`).join('')}</datalist>`;
+  $('subt').textContent='Cantidades en unidad de salida de cada insumo';
+}
+
+/* ---------- ações ---------- */
+async function boot(){
+  if(!PIN){$('v-pin').classList.remove('hidden');$('main').classList.add('hidden');return}
+  try{
+    setState(await call('apiInit',PIN));
+    $('who').innerHTML=S.usuarios.map(u=>`<option${u===ls.get('inv_who')?' selected':''}>${esc(u)}</option>`).join('');
+    $('dlT').innerHTML=[...new Set(S.items.map(x=>x.t).filter(Boolean))].map(t=>`<option value="${esc(t)}">`).join('');
+    $('v-pin').classList.add('hidden');$('main').classList.remove('hidden');show('saldos');
+  }catch(e){PIN='';ls.set('inv_pin','');$('v-pin').classList.remove('hidden');$('main').classList.add('hidden');msg('pinErr','warn',e.message)}
+}
+async function save(){
+  if(busy)return;
+  let lista=[];
+  if(mode==='lote'){
+    const p=$('lP').value,r=S.recetas[p];if(!r){toast('Este producto no tiene receta');return}
+    const f=$('lF').value||today(),name=byC[p].n;
+    lista=lineQ.filter(l=>l[1]>0).map(([c,q])=>({fecha:f,codigo:c,salida:q,destino:'Elaboración de Producto',contrato:name}));
+    const L=r.litros>0?num($('lL').value):num($('lE').value);
+    if(L>0)lista.push({fecha:f,codigo:p,ingreso:L,destino:'Ingreso a Laboratorio',contrato:name});
+    if(!lista.length){toast('No hay cantidades');return}
+  }else{
+    const x=fromLabel($('iItem').value),q=num($('iQ').value);
+    if(!x){toast('Elija el insumo de la lista');return}if(!(q>0)){toast('Escriba la cantidad');return}
+    const d=$('iD').value.trim()||dest;
+    lista=[{fecha:$('iF').value||today(),codigo:x.c,[mode==='in'?'ingreso':'salida']:q,destino:d,factura:$('iFa').value.trim(),comentario:$('iN').value.trim()}];
+  }
+  busy=true;$('fab').disabled=true;
+  try{setState(await call('apiSave',PIN,lista,W()));
+    $('iItem').value='';$('iQ').value='';$('iFa').value='';$('iN').value='';$('iD').value='';$('lL').dataset.p='';
+    toast(lista.length>1?`Lote guardado: ${lista.length} líneas`:'Movimiento guardado');busy=false;show('movs')}
+  catch(e){toast(e.message)}
+  busy=false;$('fab').disabled=false;
+}
+async function saveItem(){
+  if(busy)return;
+  const it={c:$('nC').value.trim().toUpperCase(),n:$('nN').value.trim(),u:$('nU').value.trim(),us:$('nS').value.trim(),un:$('nUN').value.trim(),t:$('nT').value.trim(),b:nb};
+  busy=true;$('fab').disabled=true;
+  try{setState(await call('apiItem',PIN,it));['nC','nN','nU','nS','nUN','nT'].forEach(i=>$(i).value='');toast('Insumo agregado');busy=false;
+    if(back==='new'){$('iItem').value=label(byC[it.c]);show('new')}else show('saldos')}
+  catch(e){msg('nMsg','warn',e.message)}
+  busy=false;$('fab').disabled=false;
+}
+async function saveRec(){
+  if(busy)return;
+  const lines=recLines.filter(l=>l[0]&&num(l[1])>0);
+  if(recLines.some(l=>l[0]===null)){msg('rMsg','warn','Hay un insumo que no está en el catálogo');return}
+  busy=true;$('fab').disabled=true;
+  try{setState(await call('apiReceta',PIN,$('lP').value,num($('rL').value)||'',lines));$('lL').dataset.p='';toast('Receta guardada');busy=false;mode='lote';show('new')}
+  catch(e){msg('rMsg','warn',e.message)}
+  busy=false;$('fab').disabled=false;
+}
+function download(name,b64){
+  try{const bin=atob(b64),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([u],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));a.download=name;document.body.appendChild(a);a.click();a.remove()}catch(e){}
+}
+async function doExport(close){
+  if(busy)return;busy=true;msg('xMsg','good','Generando Excel… puede tardar unos segundos.');
+  try{const r=await call('apiExport',PIN,close);download(r.name,r.b64);
+    $('xMsg').innerHTML=`<div class="good">${esc(r.name)} listo (${r.lineas} movimientos nuevos). También quedó en el Drive: <a href="${esc(r.url)}" target="_blank" rel="noopener">abrir</a>.${r.cerrada?' Semana cerrada.':''}</div>`;
+    if(r.cerrada)setState(await call('apiInit',PIN));rExcel()}
+  catch(e){msg('xMsg','warn',e.message)}
+  busy=false;$('bx2ok').classList.add('hidden');$('bx2').classList.remove('hidden');
+}
+
+/* ---------- eventos ---------- */
+$('bPin').addEventListener('click',()=>{PIN=$('pin').value.trim();ls.set('inv_pin',PIN);msg('pinErr');boot()});
+$('pin').addEventListener('keydown',e=>{if(e.key==='Enter')$('bPin').click()});
+$('who').addEventListener('change',()=>{ls.set('inv_who',W());if(view==='new')rNew()});
+$('tabs').addEventListener('click',e=>{const t=e.target.closest('.tab');if(t)show(t.dataset.v)});
+$('fb').addEventListener('click',e=>{const t=e.target.closest('.chip');if(!t)return;fb=t.dataset.b;document.querySelectorAll('#fb .chip').forEach(c=>c.setAttribute('aria-pressed',c===t));rSaldos()});
+$('q').addEventListener('input',rSaldos);$('all').addEventListener('change',()=>{rSaldos();fillDl()});
+$('mlst').addEventListener('click',async e=>{
+  const d=e.target.closest('[data-del]');
+  if(d){if(d.dataset.ok){try{setState(await call('apiDelete',PIN,d.dataset.del));toast('Eliminado');openMov=null;rMovs()}catch(err){toast(err.message)}}else{d.dataset.ok=1;d.textContent='Confirmar eliminar';d.classList.add('bad')}return}
+  const li=e.target.closest('.row[data-id]');if(li){openMov=openMov===li.dataset.id?null:li.dataset.id;rMovs()}
+});
+$('cb').addEventListener('click',e=>{const t=e.target.closest('.chip');if(!t)return;cb=t.dataset.b;document.querySelectorAll('#cb .chip').forEach(c=>c.setAttribute('aria-pressed',c===t));rConteo()});
+$('cq').addEventListener('input',rConteo);
+$('clst').addEventListener('change',async e=>{const c=e.target.dataset.c;if(!c)return;const v=e.target.value.trim().replace(',','.');
+  if(v!==''&&!isFinite(+v)){toast('Número inválido');return}
+  try{const r=await call('apiConteo',PIN,c,v===''?'':+v,W());if(v==='')delete S.conteo[c];else S.conteo[c]={v:+v,f:r.f,p:W()};rConteo();toast('Conteo guardado')}catch(err){toast(err.message)}});
+$('bx1').addEventListener('click',()=>doExport(false));
+$('bx2').addEventListener('click',()=>{$('bx2').classList.add('hidden');$('bx2ok').classList.remove('hidden')});
+$('bx2ok').addEventListener('click',()=>doExport(true));
+$('mode').addEventListener('click',e=>{const t=e.target.closest('.chip');if(t){mode=t.dataset.m;show('new')}});
+$('dest').addEventListener('click',e=>{const t=e.target.closest('.chip');if(t){dest=t.dataset.d;$('iD').value='';rNew()}});
+$('iItem').addEventListener('input',rItem);$('iQ').addEventListener('input',rItem);
+$('iD').addEventListener('input',()=>document.querySelectorAll('#dest .chip').forEach(c=>c.setAttribute('aria-pressed',false)));
+$('bNewItem').addEventListener('click',()=>{back='new';show('item')});
+$('lP').addEventListener('change',rLote);
+$('lL').addEventListener('input',()=>{buildLines();lineCheck()});
+$('lE').addEventListener('input',lineCheck);
+$('lRec').addEventListener('input',lineCheck);
+$('bEditRec').addEventListener('click',()=>{const r=S.recetas[$('lP').value];recLines=r?r.i.map(l=>l.slice()):[['','']];$('rL').value=r&&r.litros>0?r.litros:'';msg('rMsg');show('rec')});
+$('rAdd').addEventListener('click',()=>{recLines.push(['','']);rRec()});
+$('rLines').addEventListener('change',e=>{const i=e.target.dataset.ri;if(i==null)return;
+  if(e.target.dataset.k==='c'){const x=fromLabel(e.target.value);recLines[i][0]=e.target.value.trim()?(x?x.c:null):''}else recLines[i][1]=num(e.target.value);rRec()});
+$('rLines').addEventListener('click',e=>{const b=e.target.closest('[data-rx]');if(b){recLines.splice(+b.dataset.rx,1);rRec()}});
+$('nB').addEventListener('click',e=>{const t=e.target.closest('.chip');if(!t)return;nb=t.dataset.b;document.querySelectorAll('#nB .chip').forEach(c=>c.setAttribute('aria-pressed',c===t))});
+$('fab').addEventListener('click',()=>{if(view==='saldos'||view==='movs'){show('new')}else if(view==='new')save();else if(view==='item')saveItem();else if(view==='rec')saveRec()});
+setInterval(async()=>{if(!PIN||busy||!S||!['saldos','movs'].includes(view)||document.hidden)return;try{setState(await call('apiInit',PIN));if(!busy&&['saldos','movs'].includes(view))(view==='saldos'?rSaldos:rMovs)()}catch(e){}},60000);
+boot();
+}
+</script>
+</body>
+</html>
